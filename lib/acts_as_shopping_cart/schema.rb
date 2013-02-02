@@ -8,7 +8,7 @@ module ActsAsShoppingCart
       string  :status     # Holds the status of the item
       integer :item_id    # Holds the object id
       string  :item_type  # Holds the type of the object, for polymorphism
-      float   :price      # Holds the price of the item
+      integer :price      # Holds the price of the item
     end
   end
 end
