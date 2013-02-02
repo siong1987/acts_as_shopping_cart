@@ -6,15 +6,13 @@ module ActiveRecord
           #
           # Adds a product to the cart
           #
-          def add(object, price, quantity = 1, cumulative = true)
+          def add(object, price, status)
             cart_item = item_for(object)
 
             unless cart_item
-              shopping_cart_items.create(:item => object, :price => price, :quantity => quantity)
+              shopping_cart_items.create(:item => object, :price => price, :status => status)
             else
-              cumulative = cumulative == true ? cart_item.quantity : 0
-              cart_item.quantity = (cumulative + quantity)
-              cart_item.save
+              cart_item.update_attributes(:price => price, :status => status)
             end
           end
 
@@ -35,22 +33,19 @@ module ActiveRecord
           #
           # Remove an item from the cart
           #
-          def remove(object, quantity = 1)
+          def remove(object)
             if cart_item = item_for(object)
-              if cart_item.quantity <= quantity
+              if cart_item
                 cart_item.delete
-              else
-                cart_item.quantity = (cart_item.quantity - quantity)
-                cart_item.save
               end
             end
           end
 
           #
-          # Returns the subtotal by summing the price times quantity for all the items in the cart
+          # Returns the subtotal by summing the price for all the items in the cart
           #
           def subtotal
-            ("%.2f" % shopping_cart_items.inject(0) { |sum, item| sum += (item.price * item.quantity) }).to_f
+            ("%.2f" % shopping_cart_items.inject(0) { |sum, item| sum += (item.price) }).to_f
           end
 
           def shipping_cost
@@ -70,18 +65,6 @@ module ActiveRecord
           #
           def total
             ("%.2f" % (self.subtotal + self.taxes + self.shipping_cost)).to_f
-          end
-
-          #
-          # Return the number of unique items in the cart
-          #
-          def total_unique_items
-            shopping_cart_items.inject(0) { |sum, item| sum += item.quantity }
-          end
-
-          def cart_items
-            warn "ShoppingCart#cart_items WILL BE DEPRECATED IN LATER VERSIONS OF acts_as_shopping_cart, please use ShoppingCart#shopping_cart_items instead"
-            self.shopping_cart_items
           end
         end
       end

@@ -16,7 +16,7 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
   let(:object) { stub }
 
   let(:shopping_cart_item) do
-    stub(:quantity => 2, :save => true)
+    stub(:status => 'sold', :save => true)
   end
 
   describe :add do
@@ -26,19 +26,8 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
       end
 
       it "creates a new shopping cart item" do
-        subject.shopping_cart_items.should_receive(:create).with(:item => object, :price => 19.99, :quantity => 3)
-        subject.add(object, 19.99, 3)
-      end
-    end
-
-    context "item is not in cart" do
-      before do
-        subject.stub(:item_for).with(object)
-      end
-
-      it "creates a new shopping cart item non-cumulatively" do
-        subject.shopping_cart_items.should_receive(:create).with(:item => object, :price => 19.99, :quantity => 3)
-        subject.add(object, 19.99, 3, false)
+        subject.shopping_cart_items.should_receive(:create).with(:item => object, :price => 19.99, :status => 'sold')
+        subject.add(object, 19.99, 'sold')
       end
     end
 
@@ -48,19 +37,8 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
       end
 
       it "updates the quantity for the item" do
-        shopping_cart_item.should_receive(:quantity=).with(5)
-        subject.add(object, 19.99, 3)
-      end
-    end
-
-    context "item is already in cart" do
-      before do
-        subject.stub(:item_for).with(object).and_return(shopping_cart_item)
-      end
-
-      it "updates the quantity for the item non-cumulatively" do
-        shopping_cart_item.should_receive(:quantity=).with(3) # not 5
-        subject.add(object, 19.99, 3, false)
+        shopping_cart_item.should_receive(:update_attributes).with(:price => 21.99, :status => 'borrowed')
+        subject.add(object, 21.99, 'borrowed')
       end
     end
   end
@@ -104,26 +82,6 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
         subject.remove(object)
       end
     end
-
-    context "item is on cart" do
-      before do
-        subject.stub(:item_for).with(object).and_return(shopping_cart_item)
-      end
-
-      context "remove less items than those on cart" do
-        it "just updates the shopping cart item quantity" do
-          shopping_cart_item.should_receive(:quantity=).with(1)
-          subject.remove(object, 1)
-        end
-      end
-
-      context "remove more items than those on cart" do
-        it "removes the shopping cart item object completely" do
-          shopping_cart_item.should_receive(:delete)
-          subject.remove(object, 99)
-        end
-      end
-    end
   end
 
   describe :subtotal do
@@ -139,12 +97,12 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
 
     context "cart has items" do
       before do
-        items = [stub(:quantity => 2, :price => 33.99), stub(:quantity => 1, :price => 45.99)]
+        items = [stub(:price => 33.99), stub(:price => 45.99)]
         subject.stub(:shopping_cart_items).and_return(items)
       end
 
       it "returns the sum of the price * quantity for all items" do
-        subject.subtotal.should eq(113.97)
+        subject.subtotal.should eq(79.98)
       end
     end
   end
@@ -182,25 +140,6 @@ describe ActiveRecord::Acts::ShoppingCart::Cart::InstanceMethods do
 
     it "returns subtotal + taxes + shipping_cost" do
       subject.total.should eq(37.97)
-    end
-  end
-
-  describe :total_unique_items do
-    context "cart has no items" do
-      it "returns 0" do
-        subject.total_unique_items.should eq(0)
-      end
-    end
-
-    context "cart has some items" do
-      before do
-        items = [stub(:quantity => 2, :price => 33.99), stub(:quantity => 1, :price => 45.99)]
-        subject.stub(:shopping_cart_items).and_return(items)
-      end
-
-      it "returns the sum of the quantities of all shopping cart items" do
-        subject.total_unique_items.should eq(3)
-      end
     end
   end
 end

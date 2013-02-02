@@ -6,15 +6,7 @@ module ActiveRecord
         # Returns the subtotal, multiplying the quantity times the price of the item.
         #
         def subtotal
-          ("%.2f" % (self.quantity * self.price)).to_f
-        end
-
-        #
-        # Updates the quantity of the item
-        #
-        def update_quantity(new_quantity)
-            self.quantity = new_quantity
-            self.save
+          ("%.2f" % (self.price)).to_f
         end
 
         #

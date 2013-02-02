@@ -5,7 +5,7 @@ module ActsAsShoppingCart
     def shopping_cart_item_fields
       integer :owner_id   # Holds the owner id, for polymorphism
       string  :owner_type # Holds the type of the owner, for polymorphism
-      integer :quantity   # Holds the quantity of the object
+      string  :status     # Holds the status of the item
       integer :item_id    # Holds the object id
       string  :item_type  # Holds the type of the object, for polymorphism
       float   :price      # Holds the price of the item

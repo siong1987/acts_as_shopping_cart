@@ -80,17 +80,15 @@ In the case where your product has a price field you could do something like:
 
 I tried to make it independent to the models in case you calculate discounts, sale prices or anything customized.
 
-You can include a quantity parameter too.
+You can include a status parameter too.
 
-    @cart.add(@product, 99.99, 5)
-
-In that case, you would add 5 of the same products to the shopping cart. If you don't specify the quantity 1 will be assumed.
+    @cart.add(@product, 99.99, 'sold')
 
 ### Remove Items
 
 To remove an item from the cart you can use the remove method. You just have to send the object and the quantity you want to remove.
 
-    @cart.remove(@product, 1)
+    @cart.remove(@product)
 
 ### Empty the cart
 
@@ -146,18 +144,6 @@ class depending on your needs.
       end
     end
 
-### Total unique items
-
-You can find out how many unique items you have on your cart using the _total_unique_items_ method.
-
-So, if you had something like:
-
-    @cart.add(@product, 99.99, 5)
-
-Then,
-
-    @cart.total_unique_items # => 5
-
 ## Development
 
 Install the dependencies
@@ -169,14 +155,6 @@ Install the dependencies
 Run rspec
 
     rspec spec
-
-Run cucumber features
-
-    cucumber
-
-Both:
-
-    rake
 
 # About the author
 

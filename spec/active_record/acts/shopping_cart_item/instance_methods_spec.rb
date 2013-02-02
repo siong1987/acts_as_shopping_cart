@@ -15,16 +15,8 @@ describe ActiveRecord::Acts::ShoppingCartItem::InstanceMethods do
 
   describe :subtotal do
     it "returns the quantity * price" do
-      subject.stub(:quantity => 2, :price => 33.99)
-      subject.subtotal.should eq(67.98)
-    end
-  end
-
-  describe :update_quantity do
-    it "updates the item quantity" do
-      subject.should_receive(:quantity=).with(5)
-      subject.should_receive(:save)
-      subject.update_quantity(5)
+      subject.stub(:price => 33.99)
+      subject.subtotal.should eq(33.99)
     end
   end
 
